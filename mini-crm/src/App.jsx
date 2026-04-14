@@ -15,7 +15,7 @@ function App() {
 
   // 1. DATA FETCHING (READ)
   const fetchLeads = () => {
-    fetch('http://localhost:5000/api/leads')
+    fetch('https://dashboard.render.com/web/srv-d7fa2mc71suc738k75fg/deploys/dep-d7fa4hjbc2fs739hh4eg?r=2026-04-14%4020%3A22%3A34%7E2026-04-14%4020%3A26%3A03')
       .then(res => res.json())
       .then(data => { setLeads(data); setLoading(false); })
       .catch(err => console.error("Fetch error:", err));
