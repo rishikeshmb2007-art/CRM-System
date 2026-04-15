@@ -15,6 +15,7 @@ function App() {
 
   // 1. DATA FETCHING (READ)
   const fetchLeads = () => {
+    // Force Redeploy
     fetch('https://mini-crm-backend-cmrx.onrender.com') //Link is added.
       .then(res => res.json())
       .then(data => { setLeads(data); setLoading(false); })
