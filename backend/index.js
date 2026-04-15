@@ -3,8 +3,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// Intha line-a nalla check pannunga
+app.use(cors({
+    origin: "*", // Idhu ulagathula irukka endha domain-laiyum allow pannum
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+
 const app = express();
-app.use(cors());
 app.use(express.json());
 
 // MongoDB Connect
