@@ -54,7 +54,7 @@ const fetchLeads = () => {
   // 4. ADD & UPDATE LOGIC (CREATE & UPDATE)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = editingId ? `http://localhost:5000/api/leads/${editingId}` : 'http://localhost:5000/api/leads';
+    const url = editingId ? `https://mini-crm-backend.onrender.com/api/leads/${editingId}` : 'https://mini-crm-backend.onrender.com/api/leads';
     const method = editingId ? 'PUT' : 'POST';
 
     try {
@@ -98,7 +98,7 @@ const addLead = (newLeadData) => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this lead?")) {
       try {
-        await fetch(`http://localhost:5000/api/leads/${id}`, { method: 'DELETE' });
+        await fetch(`https://mini-crm-backend.onrender.com/api/leads/${id}`, { method: 'DELETE' });
         fetchLeads();
       } catch (error) { console.error(error); }
     }
@@ -109,7 +109,7 @@ const addLead = (newLeadData) => {
     e.preventDefault();
     if (!noteText.trim()) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/leads/${selectedLead._id}/notes`, {
+      const response = await fetch(`https://mini-crm-backend.onrender.com/api/leads/${selectedLead._id}/notes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: noteText })
