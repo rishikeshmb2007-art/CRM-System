@@ -14,13 +14,26 @@ function App() {
   const [formData, setFormData] = useState({ name: '', email: '', source: 'Website', status: 'New' });
 
   // 1. DATA FETCHING (READ)
-  const fetchLeads = () => {
-    // Force Redeploy
-    fetch('https://mini-crm-backend-cmrx.onrender.com') //Link is added.
-      .then(res => res.json())
-      .then(data => { setLeads(data); setLoading(false); })
-      .catch(err => console.error("Fetch error:", err));
-  };
+// Unga Backend Render link-a intha variable-la podunga
+const BASE_URL = "https://mini-crm-backend.onrender.com"; // ⚠️ Ingaye unga backend link-a podunga
+
+const fetchLeads = () => {
+  setLoading(true);
+  // Inga baseURL + endpoint sethu varum
+  fetch(`${BASE_URL}/api/leads`) 
+    .then(res => {
+      if (!res.ok) throw new Error("Backend not responding");
+      return res.json();
+    })
+    .then(data => {
+      setLeads(data);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      setLoading(false);
+    });
+};
 
   useEffect(() => { fetchLeads(); }, []);
 
