@@ -70,6 +70,20 @@ const fetchLeads = () => {
     } catch (error) { console.error(error); }
   };
 
+  const addLead = (newLeadData) => {
+  // Ingayum unga Render link-a thaan kudukkanum!
+  fetch('https://mini-crm-backend.onrender.com/api/leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newLeadData)
+  })
+  .then(res => res.json())
+  .then(() => {
+    fetchLeads(); // Save aanathum list-a thirumba refresh panna
+  })
+  .catch(err => console.error("Save error:", err));
+};
+
   // 5. DELETE LOGIC (DELETE)
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this lead?")) {
