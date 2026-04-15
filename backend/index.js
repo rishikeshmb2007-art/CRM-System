@@ -3,79 +3,55 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Intha line-a nalla check pannunga
-app.use(cors({
-    origin: "*", // Idhu ulagathula irukka endha domain-laiyum allow pannum
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-}));
-
 const app = express();
-app.use(express.json());
 
-// MongoDB Connect
+// 1. Middlewares
+app.use(express.json());
+app.use(cors()); // Browser block pannama irukka
+
+// 2. MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 MongoDB Vault Connected Successfully!'))
-  .catch((err) => console.error('❌ Error:', err));
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
-// Database Schema
+// 3. Database Schema & Model
 const leadSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  source: String,
-  status: { type: String, default: 'New' },
-  notes: [{ text: String, date: { type: Date, default: Date.now } }] 
-});
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  status: { type: String, default: "New" }
+}, { timestamps: true });
 
 const Lead = mongoose.model('Lead', leadSchema);
 
-// --- ROUTES ---
+// 4. Routes
 
-// 1. GET ALL
+// GET: Ellaa leads-aiyum edukka (Browser-la paakkalaam)
 app.get('/api/leads', async (req, res) => {
   try {
-    const allLeads = await Lead.find().sort({ _id: -1 }); // Pudhus ah add panrathu mela varum
-    res.json(allLeads);
-  } catch (err) { res.status(500).json({ error: 'Failed' }); }
+    const leads = await Lead.find().sort({ createdAt: -1 });
+    res.status(200).json(leads);
+  } catch (err) {
+    res.status(500).json({ error: "Data-va edukka mudiyala Boss!" });
+  }
 });
 
-// 2. CREATE NEW
+// POST: Pudhu lead add panna
+app.get('/', (req, res) => {
+    res.send("CRM Backend is Running Live! 🚀");
+});
+
 app.post('/api/leads', async (req, res) => {
   try {
-    const newLead = new Lead(req.body); 
-    await newLead.save(); 
-    res.status(201).json(newLead);
-  } catch (err) { res.status(500).json({ error: 'Failed' }); }
+    const newLead = new Lead(req.body);
+    const savedLead = await newLead.save();
+    res.status(201).json(savedLead);
+  } catch (err) {
+    res.status(400).json({ error: "Lead add panna mudiyala!" });
+  }
 });
 
-// 3. ADD NOTE TO LEAD
-app.post('/api/leads/:id/notes', async (req, res) => {
-  try {
-    const lead = await Lead.findById(req.params.id);
-    lead.notes.push({ text: req.body.text }); 
-    await lead.save();
-    res.json(lead);
-  } catch (err) { res.status(500).json({ error: 'Failed' }); }
-});
-
-// 4. UPDATE LEAD
-app.put('/api/leads/:id', async (req, res) => {
-  try {
-    const updatedLead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updatedLead);
-  } catch (err) { res.status(500).json({ error: 'Failed' }); }
-});
-
-// 5. DELETE LEAD
-app.delete('/api/leads/:id', async (req, res) => {
-  try {
-    await Lead.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted!' });
-  } catch (err) { res.status(500).json({ error: 'Failed' }); }
-});
-
-// START SERVER
-const PORT = 5000;
+// 5. Server Start
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
