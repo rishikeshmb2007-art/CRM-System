@@ -70,18 +70,28 @@ const fetchLeads = () => {
     } catch (error) { console.error(error); }
   };
 
-  const addLead = (newLeadData) => {
-  // Ingayum unga Render link-a thaan kudukkanum!
+const addLead = (newLeadData) => {
+  console.log("Sending data to backend:", newLeadData); // Debugging-kaaga
+  
   fetch('https://mini-crm-backend.onrender.com/api/leads', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json' 
+    },
     body: JSON.stringify(newLeadData)
   })
-  .then(res => res.json())
-  .then(() => {
-    fetchLeads(); // Save aanathum list-a thirumba refresh panna
+  .then(res => {
+    if (!res.ok) {
+      return res.json().then(err => { throw err; });
+    }
+    return res.json();
   })
-  .catch(err => console.error("Save error:", err));
+  .then((savedData) => {
+    console.log("Success! Saved lead:", savedData);
+    fetchLeads(); // List-a refresh panna
+  })
+  .catch(err => console.error("Save error details:", err));
 };
 
   // 5. DELETE LOGIC (DELETE)
