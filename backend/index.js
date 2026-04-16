@@ -5,25 +5,23 @@ const cors = require('cors');
 
 const app = express();
 
-// 1. Middlewares
-app.use(express.json());
-const cors = require('cors');
-
-// Intha configuration-a apdiye podunga
+// 1. GLOBAL CORS CONFIGURATION (Idhu thaan gate-a thirakkum)
 app.use(cors({
-  origin: '*', // Yar venaalum request anupalaam
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: '*', // Vercel link-a block pannaama irukka
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
-app.use(express.json()); // Idhuvum mukkiyam! // Browser block pannama irukka
+// 2. MIDDLEWARE
+app.use(express.json());
 
-// 2. MongoDB Connection
+// 3. MONGODB CONNECTION
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 MongoDB Vault Connected Successfully!'))
   .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
-// 3. Database Schema & Model
+// 4. DATABASE SCHEMA
 const leadSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -32,34 +30,36 @@ const leadSchema = new mongoose.Schema({
 
 const Lead = mongoose.model('Lead', leadSchema);
 
-// 4. Routes
+// 5. ROUTES
 
-// GET: Ellaa leads-aiyum edukka (Browser-la paakkalaam)
+// Root Route (Checking purpose)
+app.get('/', (req, res) => {
+  res.send("CRM Backend is Running Live! 🚀");
+});
+
+// GET: Fetch all leads
 app.get('/api/leads', async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
     res.status(200).json(leads);
   } catch (err) {
-    res.status(500).json({ error: "Data-va edukka mudiyala Boss!" });
+    res.status(500).json({ error: "Data-va edukka mudiyala!" });
   }
 });
 
-// POST: Pudhu lead add panna
-app.get('/', (req, res) => {
-    res.send("CRM Backend is Running Live! 🚀");
-});
-
+// POST: Save new lead
 app.post('/api/leads', async (req, res) => {
   try {
+    console.log("Data coming from Frontend:", req.body); // Render Logs-la check panna
     const newLead = new Lead(req.body);
     const savedLead = await newLead.save();
     res.status(201).json(savedLead);
   } catch (err) {
-    res.status(400).json({ error: "Lead add panna mudiyala!" });
+    res.status(400).json({ error: "Lead save aagala Boss!" });
   }
 });
 
-// 5. Server Start
+// 6. SERVER START
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
