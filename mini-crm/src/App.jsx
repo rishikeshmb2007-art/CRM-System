@@ -1,129 +1,193 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// ⚠️ UNGA RENDER LINK-A INGA CHECK PANNIKONGA
-// 🔥 INTHA LINK-A APDIYE COPY-PASTE PANNUNGA:
+// 🔥 UNGA RENDER LINK-A INGA UPDATE PANNUNGA
 const API_URL = "https://mini-crm-backend-cmrx.onrender.com/api/leads";
 
 function App() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Modal & Form States
   const [showModal, setShowModal] = useState(false);
-
-  // Form States
+  const [editId, setEditId] = useState(null); // Idhu Edit pandrom nu kandupudikka
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('New');
 
-  // 1. Fetch Leads (GET)
+  // Search & Filter States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+
+  // 1. FETCH LEADS
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
+      const res = await fetch(API_URL);
+      const data = await res.json();
       setLeads(data);
-    } catch (error) {
-      console.error("Fetch error:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error("Fetch error:", error); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchLeads();
-  }, []);
+  useEffect(() => { fetchLeads(); }, []);
 
-  // 2. Add Lead (POST)
-  const addLead = async (leadData) => {
+  // 2. SAVE OR UPDATE LEAD
+  const handleSave = async () => {
+    if (!name || !email) return alert("Name and Email required!");
+    
+    const leadData = { name, email, status };
+    const method = editId ? 'PUT' : 'POST';
+    const URL = editId ? `${API_URL}/${editId}` : API_URL;
+
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
+      const res = await fetch(URL, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadData),
       });
 
-      if (response.ok) {
-        fetchLeads(); // Refresh table
-        setShowModal(false); // Close modal
-        setName(''); setEmail(''); setStatus('New'); // Reset fields
-        alert("Lead Saved Successfully! ✅");
-      } else {
-        alert("Save panna mudiyala Boss! Check Backend.");
-      }
-    } catch (error) {
-      console.error("Save error:", error);
-    }
+      if (res.ok) {
+        fetchLeads();
+        resetForm();
+      } else { alert("Failed to save lead."); }
+    } catch (error) { console.error("Save error:", error); }
   };
 
-  // 3. Handle Save Button Click
-  const handleSave = () => {
-    if (!name || !email) {
-      alert("Please fill name and email!");
-      return;
-    }
-    const newLead = { name, email, status };
-    addLead(newLead);
+  // 3. DELETE LEAD
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this lead? 🗑️")) return;
+    
+    try {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      fetchLeads();
+    } catch (error) { console.error("Delete error:", error); }
   };
+
+  // 4. PREPARE EDIT
+  const openEditModal = (lead) => {
+    setEditId(lead._id);
+    setName(lead.name);
+    setEmail(lead.email);
+    setStatus(lead.status);
+    setShowModal(true);
+  };
+
+  const resetForm = () => {
+    setEditId(null); setName(''); setEmail(''); setStatus('New'); setShowModal(false);
+  };
+
+  // 5. EXPORT CSV
+  const exportCSV = () => {
+    const headers = ["Name,Email,Status,AI_Priority"];
+    const csvData = filteredLeads.map(l => `${l.name},${l.email},${l.status},${calculatePriority(l)}`);
+    const blob = new Blob([headers.concat(csvData).join("\n")], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'CRM_Leads_Report.csv');
+    a.click();
+  };
+
+  // 🤖 AI PRIORITY LOGIC
+  const calculatePriority = (lead) => {
+    if (lead.status === "Converted") return "⭐ High (Client)";
+    if (lead.status === "Contacted") return "🔥 Warm";
+    return "❄️ Cold";
+  };
+
+  // 📊 ANALYTICS CALCULATIONS
+  const totalLeads = leads.length;
+  const convertedCount = leads.filter(l => l.status === "Converted").length;
+  const successRate = totalLeads === 0 ? 0 : ((convertedCount / totalLeads) * 100).toFixed(1);
+
+  // 🔍 SMART SEARCH & FILTER
+  const filteredLeads = leads.filter(lead => {
+    const matchSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) || lead.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchFilter = filterStatus === 'All' || lead.status === filterStatus;
+    return matchSearch && matchFilter;
+  });
 
   return (
     <div className="App">
       <header className="header">
-        <h1>Mini CRM Dashboard</h1>
-        <button className="add-btn" onClick={() => setShowModal(true)}>+ Add New Lead</button>
+        <h1>Mini CRM Pro</h1>
+        <div className="header-actions">
+          <button className="export-btn" onClick={exportCSV}>📥 Export CSV</button>
+          <button className="add-btn" onClick={() => setShowModal(true)}>+ Add Lead</button>
+        </div>
       </header>
 
-      {loading ? (
-        <p className="loading">Loading data from Render... (Wait 30s)</p>
-      ) : (
+      {/* 📊 ANALYTICS DASHBOARD */}
+      <div className="analytics-board">
+        <div className="stat-card"><h3>Total Leads</h3><h2>{totalLeads}</h2></div>
+        <div className="stat-card"><h3>Converted</h3><h2>{convertedCount}</h2></div>
+        <div className="stat-card"><h3>Success Rate</h3><h2>{successRate}% 🎯</h2></div>
+      </div>
+
+      {/* 🔍 SEARCH & FILTER BAR */}
+      <div className="toolbar">
+        <input 
+          type="text" placeholder="🔍 Search by name or email..." 
+          value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+          className="search-bar"
+        />
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
+          <option value="All">All Status</option>
+          <option value="New">New</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Converted">Converted</option>
+        </select>
+      </div>
+
+      {/* 📋 TABLE */}
+      {loading ? ( <p className="loading">Syncing Data...</p> ) : (
         <div className="table-container">
           <table>
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Email</th>
+                <th>AI Priority</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {leads.length > 0 ? (
-                leads.map((lead) => (
+              {filteredLeads.length > 0 ? (
+                filteredLeads.map((lead) => (
                   <tr key={lead._id}>
                     <td>{lead.name}</td>
                     <td>{lead.email}</td>
+                    <td>{calculatePriority(lead)}</td>
                     <td><span className={`status ${lead.status.toLowerCase()}`}>{lead.status}</span></td>
+                    <td>
+                      <button className="action-btn edit" onClick={() => openEditModal(lead)}>✏️</button>
+                      <button className="action-btn delete" onClick={() => handleDelete(lead._id)}>🗑️</button>
+                    </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan="3">No leads found. Click Add Lead!</td>
-                </tr>
-              )}
+              ) : ( <tr><td colSpan="5">No matching leads found.</td></tr> )}
             </tbody>
           </table>
         </div>
       )}
 
-      {/* MODAL FOR ADDING LEAD */}
+      {/* 📝 MODAL */}
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <h2>Add New Lead</h2>
-            <input 
-              type="text" placeholder="Name" 
-              value={name} onChange={(e) => setName(e.target.value)} 
-            />
-            <input 
-              type="email" placeholder="Email" 
-              value={email} onChange={(e) => setEmail(e.target.value)} 
-            />
+            <h2>{editId ? "Edit Lead Data" : "Add New Lead"}</h2>
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
             <select value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="New">New</option>
               <option value="Contacted">Contacted</option>
               <option value="Converted">Converted</option>
             </select>
             <div className="modal-btns">
-              <button onClick={handleSave} className="save-btn">Save Lead</button>
-              <button onClick={() => setShowModal(false)} className="cancel-btn">Cancel</button>
+              <button onClick={handleSave} className="save-btn">{editId ? "Update Lead" : "Save Lead"}</button>
+              <button onClick={resetForm} className="cancel-btn">Cancel</button>
             </div>
           </div>
         </div>

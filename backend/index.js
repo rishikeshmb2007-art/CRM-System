@@ -1,66 +1,69 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 
 const app = express();
 
-// 1. GLOBAL CORS CONFIGURATION (Idhu thaan gate-a thirakkum)
-app.use(cors({
-    origin: '*', // Vercel link-a block pannaama irukka
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
+// 🚀 NUCLEAR CORS FIX
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 
-// 2. MIDDLEWARE
 app.use(express.json());
 
-// 3. MONGODB CONNECTION
+// 📦 MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('📦 MongoDB Vault Connected Successfully!'))
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+  .then(() => console.log('📦 MongoDB Connected Successfully!'))
+  .catch((err) => console.error('❌ Error:', err));
 
-// 4. DATABASE SCHEMA
 const leadSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
+  name: String,
+  email: String,
   status: { type: String, default: "New" }
 }, { timestamps: true });
 
 const Lead = mongoose.model('Lead', leadSchema);
 
-// 5. ROUTES
+// 🌐 ROUTES
 
-// Root Route (Checking purpose)
-app.get('/', (req, res) => {
-  res.send("CRM Backend is Running Live! 🚀");
-});
-
-// GET: Fetch all leads
+// 1. GET: Fetch all
 app.get('/api/leads', async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
-    res.status(200).json(leads);
-  } catch (err) {
-    res.status(500).json({ error: "Data-va edukka mudiyala!" });
-  }
+    res.json(leads);
+  } catch (err) { res.status(500).json({ error: "Fetch error" }); }
 });
 
-// POST: Save new lead
+// 2. POST: Create Lead
 app.post('/api/leads', async (req, res) => {
   try {
-    console.log("Data coming from Frontend:", req.body); // Render Logs-la check panna
     const newLead = new Lead(req.body);
-    const savedLead = await newLead.save();
-    res.status(201).json(savedLead);
-  } catch (err) {
-    res.status(400).json({ error: "Lead save aagala Boss!" });
-  }
+    await newLead.save();
+    res.status(201).json(newLead);
+  } catch (err) { res.status(400).json({ error: "Save error" }); }
 });
 
-// 6. SERVER START
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// 3. PUT: Update Lead (PUDHUSU 🔥)
+app.put('/api/leads/:id', async (req, res) => {
+  try {
+    const updatedLead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedLead);
+  } catch (err) { res.status(400).json({ error: "Update error" }); }
 });
+
+// 4. DELETE: Remove Lead (PUDHUSU 🔥)
+app.delete('/api/leads/:id', async (req, res) => {
+  try {
+    await Lead.findByIdAndDelete(req.params.id);
+    res.json({ message: "Lead Deleted" });
+  } catch (err) { res.status(400).json({ error: "Delete error" }); }
+});
+
+app.get('/', (req, res) => res.send("CRM Backend is Live! 🚀"));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server on ${PORT}`));
