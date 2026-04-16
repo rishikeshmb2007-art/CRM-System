@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+
 // 🔥 UNGA RENDER LINK-A INGA UPDATE PANNUNGA
 const API_URL = "https://mini-crm-backend-cmrx.onrender.com/api/leads";
 
@@ -78,15 +79,38 @@ function App() {
   };
 
   // 5. EXPORT CSV
-  const exportCSV = () => {
-    const headers = ["Name,Email,Status,AI_Priority"];
-    const csvData = filteredLeads.map(l => `${l.name},${l.email},${l.status},${calculatePriority(l)}`);
-    const blob = new Blob([headers.concat(csvData).join("\n")], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'CRM_Leads_Report.csv');
-    a.click();
+// 5. EXPORT PDF (Futuristic Professional Report)
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text("Mini CRM Pro - Leads Report", 14, 15);
+    
+    // Table Data
+    const tableColumn = ["Name", "Email", "AI Priority", "Status"];
+    const tableRows = [];
+
+    filteredLeads.forEach(lead => {
+      const leadData = [
+        lead.name,
+        lead.email,
+        calculatePriority(lead),
+        lead.status
+      ];
+      tableRows.push(leadData);
+    });
+
+    // Auto Table Generation
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      theme: 'grid',
+      headStyles: { fillColor: [102, 252, 241], textColor: [11, 12, 16] }, // Neon Cyan header
+    });
+
+    doc.save("CRM_Leads_Report.pdf");
   };
 
   // 🤖 AI PRIORITY LOGIC
@@ -113,7 +137,8 @@ function App() {
       <header className="header">
         <h1>Mini CRM Pro</h1>
         <div className="header-actions">
-          <button className="export-btn" onClick={exportCSV}>📥 Export CSV</button>
+          {/* Pazhaiya Button: <button className="export-btn" onClick={exportCSV}>📥 Export CSV</button> */}
+<button className="export-btn" onClick={exportPDF}>📄 Export PDF</button>
           <button className="add-btn" onClick={() => setShowModal(true)}>+ Add Lead</button>
         </div>
       </header>
