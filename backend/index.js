@@ -7,7 +7,16 @@ const app = express();
 
 // 1. Middlewares
 app.use(express.json());
-app.use(cors()); // Browser block pannama irukka
+const cors = require('cors');
+
+// Intha configuration-a apdiye podunga
+app.use(cors({
+  origin: '*', // Yar venaalum request anupalaam
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json()); // Idhuvum mukkiyam! // Browser block pannama irukka
 
 // 2. MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
