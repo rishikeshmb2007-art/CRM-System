@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 // ⚠️ UNGA RENDER LINK-A INGA CHECK PANNIKONGA
-const API_URL = "https://mini-crm-backend.onrender.com/api/leads";
+const API_URL = "https://mini-crm-backend-cmrx.onrender.com";
 
 function App() {
   const [leads, setLeads] = useState([]);
