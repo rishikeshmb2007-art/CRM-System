@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+// Pazhaiya import-a azhichittu idhai podunga:
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 
 // 🔥 UNGA RENDER LINK-A INGA UPDATE PANNUNGA
@@ -80,39 +83,40 @@ function App() {
 
   // 5. EXPORT CSV
 // 5. EXPORT PDF (Futuristic Professional Report)
+  // 5. EXPORT PDF (Vite & React Strict Fix)
   const exportPDF = () => {
-    const doc = new jsPDF();
-    
-    // Title
-    doc.setFontSize(18);
-    doc.text("Mini CRM Pro - Leads Report", 14, 15);
-    
-    // Table Data
-    const tableColumn = ["Name", "Email", "AI Priority", "Status"];
-    const tableRows = [];
-
-    filteredLeads.forEach(lead => {
-      const leadData = [
+    try {
+      const doc = new jsPDF();
+      
+      // Title
+      doc.setFontSize(18);
+      doc.text("Mini CRM Pro - Leads Report", 14, 15);
+      
+      // Table Data
+      const tableColumn = ["Name", "Email", "AI Priority", "Status"];
+      const tableRows = filteredLeads.map(lead => [
         lead.name,
         lead.email,
         calculatePriority(lead),
         lead.status
-      ];
-      tableRows.push(leadData);
-    });
+      ]);
 
-    // Auto Table Generation
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-      theme: 'grid',
-      headStyles: { fillColor: [102, 252, 241], textColor: [11, 12, 16] }, // Neon Cyan header
-    });
+      // Pudhu AutoTable format
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+        theme: 'grid',
+        headStyles: { fillColor: [102, 252, 241], textColor: [11, 12, 16] }, // Neon Cyan header
+      });
 
-    doc.save("CRM_Leads_Report.pdf");
+      doc.save("CRM_Leads_Report.pdf");
+      console.log("PDF Download Triggered!"); // Confirm aaga
+    } catch (error) {
+      console.error("PDF Generate aagala Boss:", error);
+      alert("PDF Error! Console-a check pannunga.");
+    }
   };
-
   // 🤖 AI PRIORITY LOGIC
   const calculatePriority = (lead) => {
     if (lead.status === "Converted") return "⭐ High (Client)";
