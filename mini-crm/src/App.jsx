@@ -328,11 +328,12 @@ const handleGenerateEmail = async (leadName, companyName, leadStatus) => {
       {/* OLD AI DISPLAY BOX-A REMOVE PANNITTU INDHA MODAL-A PODUNGA */}
 
       {/* 🌌 Modern Glassmorphism Modal (Popup) */}
+      {/* 🌌 Modern Glassmorphism Modal (Popup) */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
             
-            {/* ✨ Glass Card Container */}
-            <div className="relative bg-white/20 dark:bg-black/30 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto p-6 md:p-8 animate-modalPop">
+            {/* ✨ Glass Card Container (Ippo max-w-4xl pottu width-a perusaakkittom) */}
+            <div className="relative bg-white/20 dark:bg-black/30 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-y-auto p-6 md:p-10 animate-modalPop">
               
               {/* ❌ Close Button (Top Right) */}
               <button 
@@ -345,29 +346,29 @@ const handleGenerateEmail = async (leadName, companyName, leadStatus) => {
               {/* 🎯 Modal Header */}
               <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
                 <span className="text-3xl">✨</span>
-                <h2 className="text-2xl font-bold text-white tracking-tight">AI Sales Assistant Drafte</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">AI Sales Assistant Drafter</h2>
               </div>
 
-              {/* ✍️ Typing Animation Body */}
-              <div className="bg-white/5 rounded-xl p-5 border border-white/10">
-                <p className="whitespace-pre-wrap text-white/90 leading-relaxed font-mono text-sm md:text-base">
+              {/* ✍️ Typing Animation Body (p-6 and pl-2 add pannirukkom text idikkama irukka) */}
+              <div className="bg-white/5 rounded-xl p-6 md:p-8 border border-white/10 overflow-hidden">
+                <p className="whitespace-pre-wrap break-words text-white/90 leading-relaxed font-mono text-sm md:text-lg pl-2">
                   {animatedEmail}
-                  {/* 💡 Flashing Cursor effect (Kadaisiya varum) */}
-                  <span className="inline-block w-2 h-4 ml-1 bg-indigo-400 animate-pulse"></span>
+                  {/* 💡 Flashing Cursor effect */}
+                  <span className="inline-block w-2.5 h-5 ml-1 bg-indigo-400 animate-pulse align-middle"></span>
                 </p>
               </div>
 
               {/* 📦 Modal Footer (Actions) */}
-              <div className="mt-6 pt-4 border-t border-white/10 flex justify-end gap-3">
+              <div className="mt-8 pt-5 border-t border-white/10 flex justify-end gap-4">
                 <button 
                   onClick={() => { navigator.clipboard.writeText(aiEmail); alert("Copied Boss!"); }} 
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm md:text-base font-semibold transition-all shadow-md active:scale-95"
                 >
                   📋 Copy to Clipboard
                 </button>
                 <button 
                   onClick={() => setIsModalOpen(false)}
-                  className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-sm transition-colors"
+                  className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl text-sm md:text-base transition-colors"
                 >
                   Close
                 </button>
