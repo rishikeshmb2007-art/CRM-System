@@ -3,7 +3,7 @@ import './App.css';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_URL = "https://mini-crm-backend-cmrx.onrender.com/api/leads";
+const API_URL = https://crm-system-uvnk.onrender.com;
  // Animation text
 
 function App() {
