@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-
+const { generateEmail } = require('./controllers/aiController');
 const app = express();
 
 // 🚀 NUCLEAR CORS FIX
@@ -46,6 +46,9 @@ app.post('/api/leads', async (req, res) => {
     res.status(201).json(newLead);
   } catch (err) { res.status(400).json({ error: "Save error" }); }
 });
+
+// AI Email Route
+app.post('/api/generate-email', generateEmail);
 
 // 3. PUT: Update Lead (PUDHUSU 🔥)
 app.put('/api/leads/:id', async (req, res) => {
