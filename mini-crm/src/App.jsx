@@ -16,9 +16,6 @@ function App() {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('New');
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('All');
-
     const [aiEmail, setAiEmail] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
