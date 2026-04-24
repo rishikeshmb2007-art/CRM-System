@@ -25,6 +25,10 @@ function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [animatedEmail, setAnimatedEmail] = useState('');
 
+    // searchQuery-kku badhila searchTerm nu maathikkonga
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("All");
+
   // 1. FETCH LEADS
   const fetchLeads = async () => {
     setLoading(true);
@@ -235,11 +239,12 @@ const handleGenerateEmail = async (leadName, companyName, leadStatus) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         
         {/* 🎯 Search Box */}
+        {/* 🎯 Search Box */}
         <input
           type="text"
           placeholder="Search by name or email..."
-          value={searchQuery} 
-          onChange={(e) => setSearchQuery(e.target.value)} 
+          value={searchTerm} // <--- Inga maathirukkom
+          onChange={(e) => setSearchTerm(e.target.value)} // <--- Inga maathirukkom
           className="md:col-span-3 w-full p-4 bg-gray-800/50 text-white placeholder-gray-400 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-base shadow-sm"
         />
 
