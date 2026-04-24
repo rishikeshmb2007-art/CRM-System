@@ -3,7 +3,7 @@ import './App.css';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_URL = 'https://crm-system-uvnk.onrender.com/api';
+const API_URL = 'https://crm-system-uvnk.onrender.com/api/leads';
  // Animation text
 
 function App() {
@@ -232,22 +232,21 @@ const handleGenerateEmail = async (leadName, companyName, leadStatus) => {
       </div>
 
       {/* 🔍 Search and Filter Section */}
-      {/* 🔍 Search and Filter Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         
-        {/* 🎯 Search Box (Idhu ippo 3 pangu edatha eduthukkum - Semman Neelama irukkum) */}
+        {/* 🎯 Search Box */}
         <input
           type="text"
           placeholder="Search by name or email..."
-          // value={searchQuery} 
-          // onChange={(e) => setSearchQuery(e.target.value)} 
+          value={searchQuery} 
+          onChange={(e) => setSearchQuery(e.target.value)} 
           className="md:col-span-3 w-full p-4 bg-gray-800/50 text-white placeholder-gray-400 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-base shadow-sm"
         />
 
-        {/* 🎛️ Filter Dropdown (Idhu 1 pangu edatha eduthukkum) */}
+        {/* 🎛️ Filter Dropdown */}
         <select
-          // value={filterStatus}
-          // onChange={(e) => setFilterStatus(e.target.value)}
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
           className="md:col-span-1 w-full p-4 bg-gray-800/50 text-white border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer text-base shadow-sm"
         >
           <option value="All" className="bg-gray-800 py-2">All Status</option>
